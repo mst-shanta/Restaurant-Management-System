@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Reservation | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+
+        <h1 class="fw-bold">
+            Table Reservation
+        </h1>
+
+        <p class="text-muted">
+            Check availability and reserve a table for your visit.
+        </p>
+
+    </div>
+
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-5">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        <!-- Date -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Reservation Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="reservation_date"
+                                class="form-control"
+                                value="{{ selected_date|default:'' }}"
+                                min="{{ today }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Time -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Reservation Time
+                            </label>
+
+                            <input
+                                type="time"
+                                name="reservation_time"
+                                class="form-control"
+                                value="{{ selected_time|default:'' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Number of People -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Number of People
+                            </label>
+
+                            <select
+                                name="number_of_guests"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select number of people
+                                </option>
+
+                                {% for i in "12345678" %}
+
+                                    <option
+                                        value="{{ forloop.counter }}"
+                                        {% if selected_guests == forloop.counter %}selected{% endif %}
+                                    >
+                                        {{ forloop.counter }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Table -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Preferred Table
+                            </label>
+
+                            <select
+                                name="table"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select a table
+                                </option>
+
+                                {% for table in tables %}
+
+                                    <option
+                                        value="{{ table.id }}"
+                                        {% if selected_table_id == table.id %}selected{% endif %}
+                                    >
+                                        Table {{ table.table_number }}
+                                        — {{ table.capacity }} Seats
+                                    </option>
+
+                                {% empty %}
+
+                                    <option value="">
+                                        No tables currently available
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Special Request -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Special Request
+                                <span class="text-muted fw-normal">
+                                    (Optional)
+                                </span>
+                            </label>
+
+                            <textarea
+                                name="special_request"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Any special request..."
+                            >{{ special_request|default:'' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Check Availability -->
+
+                        <div class="d-grid mb-3">
+
+                            <button
+                                type="submit"
+                                name="action"
+                                value="check"
+                                class="btn btn-outline-primary btn-lg"
+                            >
+                                Check Availability
+                            </button>
+
+                        </div>
+
+
+                        <!-- Book Table -->
+
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                name="action"
+                                value="book"
+                                class="btn btn-primary btn-lg"
+                            >
+                                Book Table
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

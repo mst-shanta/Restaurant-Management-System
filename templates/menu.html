@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Menu | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+
+        <h1 class="fw-bold">
+            Our Menu
+        </h1>
+
+        <p class="text-muted">
+            Explore our delicious food and choose your favorites.
+        </p>
+
+    </div>
+
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    {% for category in categories %}
+
+        <h3 class="mb-4">
+            {{ category.name }}
+        </h3>
+
+
+        <div class="row g-4 mb-5">
+
+            {% for item in category.menu_items.all %}
+
+                {% if item.available %}
+
+                    <div class="col-md-4">
+
+                        <div class="card h-100 shadow-sm">
+
+                            {% if item.image %}
+
+                                <img
+                                    src="{{ item.image.url }}"
+                                    class="card-img-top"
+                                    alt="{{ item.name }}"
+                                    style="
+                                        height: 220px;
+                                        object-fit: cover;
+                                    "
+                                >
+
+                            {% endif %}
+
+
+                            <div class="card-body">
+
+                                <h5 class="card-title">
+                                    {{ item.name }}
+                                </h5>
+
+
+                                {% if item.description %}
+
+                                    <p class="card-text text-muted">
+                                        {{ item.description }}
+                                    </p>
+
+                                {% endif %}
+
+
+                                <strong class="d-block mb-3">
+                                    ৳{{ item.price }}
+                                </strong>
+
+
+                                <!-- ADD TO CART -->
+                                <form
+                                    method="POST"
+                                    action="{% url 'add_to_cart' item.id %}"
+                                >
+
+                                    {% csrf_token %}
+
+
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <!-- QUANTITY -->
+                                        <div
+                                            class="input-group"
+                                            style="width: 125px;"
+                                        >
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary quantity-minus"
+                                            >
+                                                −
+                                            </button>
+
+
+                                            <input
+                                                type="number"
+                                                name="quantity"
+                                                value="1"
+                                                min="1"
+                                                class="form-control text-center quantity-input"
+                                            >
+
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary quantity-plus"
+                                            >
+                                                +
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- ADD TO CART -->
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary flex-grow-1"
+                                        >
+                                            Add to Cart
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    {% empty %}
+
+        <div class="text-center py-5">
+
+            <h4>
+                Menu Coming Soon
+            </h4>
+
+            <p class="text-muted">
+                Add menu categories and items from the admin panel.
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- QUANTITY BUTTON JAVASCRIPT -->
+
+<script>
+
+document.querySelectorAll('.quantity-plus').forEach(function(button) {
+
+    button.addEventListener('click', function() {
+
+        const input = this
+            .closest('.input-group')
+            .querySelector('.quantity-input');
+
+        input.value = parseInt(input.value) + 1;
+
+    });
+
+});
+
+
+document.querySelectorAll('.quantity-minus').forEach(function(button) {
+
+    button.addEventListener('click', function() {
+
+        const input = this
+            .closest('.input-group')
+            .querySelector('.quantity-input');
+
+        let quantity = parseInt(input.value);
+
+        if (quantity > 1) {
+            input.value = quantity - 1;
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

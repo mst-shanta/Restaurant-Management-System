@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Cart | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+
+        <h1 class="fw-bold">
+            Your Cart
+        </h1>
+
+        <p class="text-muted">
+            Review your selected items before placing your order.
+        </p>
+
+    </div>
+
+
+    {% if cart_items %}
+
+        <div class="row">
+
+            <!-- CART ITEMS -->
+            <div class="col-lg-8">
+
+                {% for cart_item in cart_items %}
+
+                    <div class="card shadow-sm mb-3">
+
+                        <div class="card-body">
+
+                            <div
+                                class="row align-items-center"
+                            >
+
+                                <!-- IMAGE -->
+                                <div class="col-md-2">
+
+                                    {% if cart_item.item.image %}
+
+                                        <img
+                                            src="{{ cart_item.item.image.url }}"
+                                            alt="{{ cart_item.item.name }}"
+                                            class="img-fluid rounded"
+                                            style="
+                                                width: 100px;
+                                                height: 80px;
+                                                object-fit: cover;
+                                            "
+                                        >
+
+                                    {% else %}
+
+                                        <div
+                                            class="bg-light rounded text-center py-3"
+                                        >
+                                            No Image
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <!-- NAME -->
+                                <div class="col-md-3">
+
+                                    <h5 class="mb-1">
+                                        {{ cart_item.item.name }}
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        ৳{{ cart_item.item.price }}
+                                        each
+                                    </small>
+
+                                </div>
+
+
+                                <!-- QUANTITY -->
+                                <div class="col-md-3">
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'update_cart' cart_item.item.id %}"
+                                        class="d-flex"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            value="{{ cart_item.quantity }}"
+                                            min="1"
+                                            class="form-control me-2"
+                                            style="width: 80px;"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-outline-primary"
+                                        >
+                                            Update
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+
+                                <!-- SUBTOTAL -->
+                                <div class="col-md-2">
+
+                                    <strong>
+                                        ৳{{ cart_item.subtotal }}
+                                    </strong>
+
+                                </div>
+
+
+                                <!-- REMOVE -->
+                                <div class="col-md-2 text-end">
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'remove_from_cart' cart_item.item.id %}"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-outline-danger"
+                                        >
+                                            Remove
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- ORDER SUMMARY -->
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <h4 class="mb-4">
+                            Order Summary
+                        </h4>
+
+
+                        <div
+                            class="d-flex justify-content-between mb-3"
+                        >
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <strong>
+                                ৳{{ total }}
+                            </strong>
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <div
+                            class="d-flex justify-content-between mb-4"
+                        >
+
+                            <h5>
+                                Total
+                            </h5>
+
+                            <h5>
+                                ৳{{ total }}
+                            </h5>
+
+                        </div>
+
+
+                       <a
+    href="{% url 'checkout' %}"
+    class="btn btn-primary w-100"
+>
+    Proceed to Checkout
+</a>
+
+                        <a
+    href="{% url 'menu' %}"
+    class="btn btn-outline-secondary w-100 mt-2"
+>
+    Continue Ordering
+</a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="text-center py-5">
+
+            <h3>
+                Your cart is empty.
+            </h3>
+
+            <p class="text-muted">
+                Add some delicious items from our menu.
+            </p>
+
+            <a
+                href="{% url 'menu' %}"
+                class="btn btn-primary"
+            >
+                Browse Menu
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

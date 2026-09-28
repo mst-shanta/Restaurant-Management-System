@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Staff Dashboard | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="mb-5">
+        <h1 class="fw-bold">Staff Dashboard</h1>
+        <p class="text-muted">
+            View your work schedule, salary and performance information.
+        </p>
+    </div>
+
+
+    <!-- Summary Cards -->
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        This Month's Salary
+                    </h6>
+
+                    <h2 class="fw-bold mt-2">
+                        ৳25,000
+                    </h2>
+
+                    <span class="badge bg-success">
+                        Updated
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Performance Rate
+                    </h6>
+
+                    <h2 class="fw-bold mt-2">
+                        92%
+                    </h2>
+
+                    <span class="badge bg-primary">
+                        Excellent
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Current Status
+                    </h6>
+
+                    <h2 class="fw-bold mt-2">
+                        Active
+                    </h2>
+
+                    <span class="badge bg-success">
+                        Working
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Schedule -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <h4 class="mb-4">
+                My Work Schedule
+            </h4>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Monday</td>
+                            <td>14 Sep 2026</td>
+                            <td>10:00 AM – 6:00 PM</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Tuesday</td>
+                            <td>15 Sep 2026</td>
+                            <td>10:00 AM – 6:00 PM</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Wednesday</td>
+                            <td>16 Sep 2026</td>
+                            <td>12:00 PM – 8:00 PM</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Thursday</td>
+                            <td>17 Sep 2026</td>
+                            <td>OFF</td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    Day Off
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Friday</td>
+                            <td>18 Sep 2026</td>
+                            <td>4:00 PM – 10:00 PM</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    Scheduled
+                                </span>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

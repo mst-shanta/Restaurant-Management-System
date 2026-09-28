@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Admin Dashboard | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="mb-5">
+
+        <h1 class="fw-bold">
+            Admin Dashboard
+        </h1>
+
+        <p class="text-muted">
+            Manage restaurant operations from one place.
+        </p>
+
+    </div>
+
+
+    <!-- Statistics -->
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Customers
+                    </p>
+
+                    <h2 class="fw-bold">
+                        120
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Reservations
+                    </p>
+
+                    <h2 class="fw-bold">
+                        32
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Orders
+                    </p>
+
+                    <h2 class="fw-bold">
+                        58
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Monthly Budget
+                    </p>
+
+                    <h2 class="fw-bold">
+                        ৳500K
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Reservation Requests -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0">
+                    Reservation Requests
+                </h4>
+
+                <a
+                    href="{% url 'reservation' %}"
+                    class="btn btn-outline-primary"
+                >
+                    View Reservations
+                </a>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>People</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>Rahim Ahmed</td>
+
+                            <td>15 Sep 2026</td>
+
+                            <td>7:00 PM</td>
+
+                            <td>4</td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <button class="btn btn-sm btn-success">
+                                    Accept
+                                </button>
+
+                                <button class="btn btn-sm btn-danger">
+                                    Reject
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td>Karim Hasan</td>
+
+                            <td>16 Sep 2026</td>
+
+                            <td>8:00 PM</td>
+
+                            <td>2</td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <button class="btn btn-sm btn-success">
+                                    Accept
+                                </button>
+
+                                <button class="btn btn-sm btn-danger">
+                                    Reject
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Management Options -->
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Menu Management
+                    </h5>
+
+                    <p class="text-muted">
+                        Add, update or remove menu items.
+                    </p>
+
+                    <a href="{% url 'menu' %}"
+                       class="btn btn-primary">
+                        Manage Menu
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Staff Management
+                    </h5>
+
+                    <p class="text-muted">
+                        Manage staff schedules and information.
+                    </p>
+
+                    <a
+                        href="{% url 'staff_dashboard' %}"
+                        class="btn btn-primary"
+                    >
+                        Manage Staff
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Table Management
+                    </h5>
+
+                    <p class="text-muted">
+                        Manage restaurant tables and availability.
+                    </p>
+
+                    <a
+                        href="{% url 'reservation' %}"
+                        class="btn btn-primary"
+                    >
+                        Manage Tables
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Budget Management
+                    </h5>
+
+                    <p class="text-muted">
+                        Monitor and update the monthly budget.
+                    </p>
+
+                    <button class="btn btn-primary">
+                        Manage Budget
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

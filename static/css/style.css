@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+
+/* Hero Section */
+
+.hero-section {
+    min-height: 500px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.65),
+            rgba(0, 0, 0, 0.65)
+        ),
+        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4")
+        center / cover;
+}
+
+
+/* Service Cards */
+
+.service-card {
+    border: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.service-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+.service-icon {
+    font-size: 45px;
+
+    margin-bottom: 15px;
+}
+
+
+/* Feature Section */
+
+.features-section {
+    background-color: white;
+}
+
+
+/* Footer */
+
+footer {
+    margin-top: 0;
+}
+

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-section">
+
+    <div class="container text-center">
+
+        <h1 class="display-3 fw-bold">
+            Welcome to Our Restaurant
+        </h1>
+
+        <p class="lead mt-3">
+            Delicious food, easy ordering and simple table reservations.
+        </p>
+
+        <div class="mt-4">
+
+            <a href="/menu/" class="btn btn-primary btn-lg me-2">
+                View Menu
+            </a>
+
+            <a href="/reservation/" class="btn btn-outline-light btn-lg">
+                Book a Table
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="container py-5">
+
+    <div class="text-center mb-5">
+
+        <h2>Our Services</h2>
+
+        <p class="text-muted">
+            Everything you need for a convenient restaurant experience.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="card service-card h-100">
+
+                <div class="card-body text-center p-4">
+
+                    <div class="service-icon">
+                        🍽
+                    </div>
+
+                    <h4>Food Menu</h4>
+
+                    <p class="text-muted">
+                        Browse our food menu and check item prices.
+                    </p>
+
+                    <a href="/menu/" class="btn btn-primary">
+                        Explore Menu
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card service-card h-100">
+
+                <div class="card-body text-center p-4">
+
+                    <div class="service-icon">
+                        🪑
+                    </div>
+
+                    <h4>Table Reservation</h4>
+
+                    <p class="text-muted">
+                        Check availability and reserve a table.
+                    </p>
+
+                    <a href="/reservation/" class="btn btn-primary">
+                        Reserve Now
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card service-card h-100">
+
+                <div class="card-body text-center p-4">
+
+                    <div class="service-icon">
+                        🛒
+                    </div>
+
+                    <h4>Online Ordering</h4>
+
+                    <p class="text-muted">
+                        Select your favorite food and place an order.
+                    </p>
+
+                    <a href="/menu/" class="btn btn-primary">
+                        Order Food
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="features-section py-5">
+
+    <div class="container text-center">
+
+        <h2 class="mb-4">
+            Why Choose Our System?
+        </h2>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <h5>Easy Reservation</h5>
+                <p>Check table availability and book online.</p>
+            </div>
+
+            <div class="col-md-4">
+                <h5>Simple Ordering</h5>
+                <p>Browse the menu and order your favorite food.</p>
+            </div>
+
+            <div class="col-md-4">
+                <h5>Efficient Management</h5>
+                <p>Restaurant staff and managers can manage operations efficiently.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

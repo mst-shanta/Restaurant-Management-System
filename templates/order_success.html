@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Order Confirmed | Restaurant Management System
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body p-5">
+
+                    <h1 class="text-success mb-3">
+                        Order Confirmed!
+                    </h1>
+
+                    <p class="lead">
+                        Thank you for your order.
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Order Number:</strong>
+                        #{{ order.id }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {{ order.status }}
+                    </p>
+
+                    <p>
+                        <strong>Total:</strong>
+                        ৳{{ order.total_amount }}
+                    </p>
+
+                    <div class="mt-4">
+
+                        <a
+                            href="{% url 'menu' %}"
+                            class="btn btn-primary"
+                        >
+                            Order More Food
+                        </a>
+
+                        <a
+                            href="{% url 'home' %}"
+                            class="btn btn-outline-secondary ms-2"
+                        >
+                            Back to Home
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
