@@ -8,6 +8,8 @@ Admin Dashboard | Restaurant Management System
 
 <div class="container py-5">
 
+    <!-- Header -->
+
     <div class="mb-5">
 
         <h1 class="fw-bold">
@@ -27,7 +29,7 @@ Admin Dashboard | Restaurant Management System
 
         <div class="col-md-3">
 
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
@@ -36,7 +38,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <h2 class="fw-bold">
-                        120
+                        {{ customer_count }}
                     </h2>
 
                 </div>
@@ -48,7 +50,7 @@ Admin Dashboard | Restaurant Management System
 
         <div class="col-md-3">
 
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
@@ -57,7 +59,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <h2 class="fw-bold">
-                        32
+                        {{ reservation_count }}
                     </h2>
 
                 </div>
@@ -69,7 +71,7 @@ Admin Dashboard | Restaurant Management System
 
         <div class="col-md-3">
 
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
@@ -78,7 +80,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <h2 class="fw-bold">
-                        58
+                        {{ order_count }}
                     </h2>
 
                 </div>
@@ -90,7 +92,7 @@ Admin Dashboard | Restaurant Management System
 
         <div class="col-md-3">
 
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
@@ -99,7 +101,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <h2 class="fw-bold">
-                        ৳500K
+                        ৳{{ monthly_budget|floatformat:0 }}
                     </h2>
 
                 </div>
@@ -109,6 +111,29 @@ Admin Dashboard | Restaurant Management System
         </div>
 
     </div>
+
+
+    <!-- Messages -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+
+                {{ message }}
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
 
 
     <!-- Reservation Requests -->
@@ -144,74 +169,117 @@ Admin Dashboard | Restaurant Management System
                             <th>Date</th>
                             <th>Time</th>
                             <th>People</th>
+                            <th>Table</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
 
                     </thead>
 
+
                     <tbody>
 
+                        {% for reservation in pending_reservations %}
+
                         <tr>
 
-                            <td>Rahim Ahmed</td>
-
-                            <td>15 Sep 2026</td>
-
-                            <td>7:00 PM</td>
-
-                            <td>4</td>
-
                             <td>
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
+                                {% if reservation.customer.user.get_full_name %}
+                                    {{ reservation.customer.user.get_full_name }}
+                                {% else %}
+                                    {{ reservation.customer.user.username }}
+                                {% endif %}
                             </td>
 
+
+                            <td>
+                                {{ reservation.reservation_date|date:"d M Y" }}
+                            </td>
+
+
+                            <td>
+                                {{ reservation.reservation_time|time:"g:i A" }}
+                            </td>
+
+
+                            <td>
+                                {{ reservation.number_of_guests }}
+                            </td>
+
+
+                            <td>
+                                {% if reservation.table %}
+                                    Table {{ reservation.table.table_number }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+
                             <td>
 
-                                <button class="btn btn-sm btn-success">
-                                    Accept
-                                </button>
+                                <span class="badge bg-warning text-dark">
+                                    {{ reservation.status }}
+                                </span>
 
-                                <button class="btn btn-sm btn-danger">
-                                    Reject
-                                </button>
+                            </td>
+
+
+                            <td>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'update_reservation_status' reservation.id 'Confirmed' %}"
+                                    class="d-inline"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-success"
+                                    >
+                                        Accept
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="post"
+                                    action="{% url 'update_reservation_status' reservation.id 'Cancelled' %}"
+                                    class="d-inline"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-danger"
+                                    >
+                                        Reject
+                                    </button>
+
+                                </form>
 
                             </td>
 
                         </tr>
 
+                        {% empty %}
 
                         <tr>
 
-                            <td>Karim Hasan</td>
-
-                            <td>16 Sep 2026</td>
-
-                            <td>8:00 PM</td>
-
-                            <td>2</td>
-
-                            <td>
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
-                            </td>
-
-                            <td>
-
-                                <button class="btn btn-sm btn-success">
-                                    Accept
-                                </button>
-
-                                <button class="btn btn-sm btn-danger">
-                                    Reject
-                                </button>
-
+                            <td
+                                colspan="7"
+                                class="text-center text-muted py-4"
+                            >
+                                No pending reservation requests.
                             </td>
 
                         </tr>
+
+                        {% endfor %}
 
                     </tbody>
 
@@ -228,6 +296,9 @@ Admin Dashboard | Restaurant Management System
 
     <div class="row g-4">
 
+
+        <!-- Menu -->
+
         <div class="col-md-3">
 
             <div class="card border-0 shadow-sm h-100">
@@ -242,8 +313,10 @@ Admin Dashboard | Restaurant Management System
                         Add, update or remove menu items.
                     </p>
 
-                    <a href="{% url 'menu' %}"
-                       class="btn btn-primary">
+                    <a
+                        href="/admin/core/menuitem/"
+                        class="btn btn-primary"
+                    >
                         Manage Menu
                     </a>
 
@@ -253,6 +326,8 @@ Admin Dashboard | Restaurant Management System
 
         </div>
 
+
+        <!-- Staff -->
 
         <div class="col-md-3">
 
@@ -269,7 +344,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <a
-                        href="{% url 'staff_dashboard' %}"
+                        href="/admin/core/staff/"
                         class="btn btn-primary"
                     >
                         Manage Staff
@@ -281,6 +356,8 @@ Admin Dashboard | Restaurant Management System
 
         </div>
 
+
+        <!-- Tables -->
 
         <div class="col-md-3">
 
@@ -297,7 +374,7 @@ Admin Dashboard | Restaurant Management System
                     </p>
 
                     <a
-                        href="{% url 'reservation' %}"
+                        href="/admin/core/restauranttable/"
                         class="btn btn-primary"
                     >
                         Manage Tables
@@ -309,6 +386,8 @@ Admin Dashboard | Restaurant Management System
 
         </div>
 
+
+        <!-- Budget -->
 
         <div class="col-md-3">
 
@@ -324,9 +403,12 @@ Admin Dashboard | Restaurant Management System
                         Monitor and update the monthly budget.
                     </p>
 
-                    <button class="btn btn-primary">
+                    <a
+                        href="/admin/core/budget/"
+                        class="btn btn-primary"
+                    >
                         Manage Budget
-                    </button>
+                    </a>
 
                 </div>
 

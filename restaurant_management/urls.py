@@ -130,7 +130,15 @@ urlpatterns = [
         admin_dashboard,
         name='admin_dashboard'
     ),
+    path(
+    'admin-panel/reservation/<int:reservation_id>/<str:status>/',
+    update_reservation_status,
+    name='update_reservation_status'
+),
+
 ]
+
+
 
 
 # ============================================================

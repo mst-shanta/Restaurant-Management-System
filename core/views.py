@@ -3,16 +3,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
-from .models import (
-    Category,
-    MenuItem,
-    Customer,
-    Staff,
-    Order,
-    OrderItem,
-    Payment,
-)
+from .models import *
 
 
 # ============================================================
@@ -595,8 +590,104 @@ def staff_dashboard(request):
 # ADMIN DASHBOARD
 # ============================================================
 
+@login_required
 def admin_dashboard(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to access the admin dashboard.")
+        return redirect('home')
+
+    from django.utils import timezone
+
+    today = timezone.localdate()
+
+    current_month_budget = Budget.objects.filter(
+        month=today.month,
+        year=today.year
+    ).first()
+
+    pending_reservations = Reservation.objects.filter(
+        status='Pending'
+    ).select_related(
+        'customer',
+        'table'
+    ).order_by(
+        'reservation_date',
+        'reservation_time'
+    )
+
+    context = {
+        'customer_count': Customer.objects.count(),
+        'reservation_count': Reservation.objects.count(),
+        'order_count': Order.objects.count(),
+
+        'monthly_budget': (
+            current_month_budget.amount
+            if current_month_budget
+            else 0
+        ),
+
+        'pending_reservations': pending_reservations,
+    }
+
     return render(
         request,
-        'admin_panel/dashboard.html'
+        'admin_panel/dashboard.html',
+        context
     )
+@login_required
+@require_POST
+def update_reservation_status(request, reservation_id, status):
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('home')
+
+    reservation = get_object_or_404(
+        Reservation,
+        id=reservation_id
+    )
+
+    if status == 'Confirmed':
+
+        # Find an available table that can accommodate the guests
+        available_table = RestaurantTable.objects.filter(
+            is_available=True,
+            capacity__gte=reservation.number_of_guests
+        ).order_by(
+            'capacity'
+        ).first()
+
+        if not available_table:
+            messages.error(
+                request,
+                "No available table can accommodate this reservation."
+            )
+            return redirect('admin_dashboard')
+
+        reservation.table = available_table
+        reservation.status = 'Confirmed'
+        reservation.save()
+
+        available_table.is_available = False
+        available_table.save()
+
+        messages.success(
+            request,
+            f"Reservation for {reservation.customer.user.get_full_name() or reservation.customer.user.username} has been confirmed."
+        )
+
+    elif status == 'Cancelled':
+
+        # If the reservation already had a table, make it available again
+        if reservation.table:
+            reservation.table.is_available = True
+            reservation.table.save()
+
+        reservation.status = 'Cancelled'
+        reservation.save()
+
+        messages.success(
+            request,
+            "Reservation has been rejected."
+        )
+
+    return redirect('admin_dashboard')
