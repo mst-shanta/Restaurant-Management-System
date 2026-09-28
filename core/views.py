@@ -261,16 +261,31 @@ def register(request):
 # LOGIN
 # ============================================================
 
+# ============================================================
+# LOGIN
+# ============================================================
+
 def login_view(request):
 
-    # If already logged in, send the user to the correct area
+    # --------------------------------------------------------
+    # SELECTED ROLE FROM NAVBAR
+    # --------------------------------------------------------
+
+    selected_role = request.GET.get(
+        'role',
+        ''
+    ).strip()
+
+
+    # --------------------------------------------------------
+    # ALREADY AUTHENTICATED
+    # --------------------------------------------------------
+
     if request.user.is_authenticated:
 
-        # Admin
         if request.user.is_superuser:
             return redirect('admin_dashboard')
 
-        # Staff
         try:
             request.user.staff_profile
             return redirect('staff_dashboard')
@@ -278,7 +293,6 @@ def login_view(request):
         except Staff.DoesNotExist:
             pass
 
-        # Customer
         try:
             request.user.customer_profile
             return redirect('home')
@@ -287,7 +301,16 @@ def login_view(request):
             return redirect('home')
 
 
+    # --------------------------------------------------------
+    # LOGIN FORM
+    # --------------------------------------------------------
+
     if request.method == 'POST':
+
+        role = request.POST.get(
+            'role',
+            ''
+        ).strip()
 
         username = request.POST.get(
             'username',
@@ -299,16 +322,44 @@ def login_view(request):
             ''
         )
 
+        # Keep the selected role if the form has an error
+        selected_role = role
+
+
+        # ----------------------------------------------------
+        # CHECK ROLE SELECTION
+        # ----------------------------------------------------
+
+        if role not in [
+            'customer',
+            'staff',
+            'admin'
+        ]:
+
+            messages.error(
+                request,
+                'Please select your login role.'
+            )
+
+            return render(
+                request,
+                'login.html',
+                {
+                    'selected_role': selected_role
+                }
+            )
+
+
+        # ----------------------------------------------------
+        # AUTHENTICATE USER
+        # ----------------------------------------------------
+
         user = authenticate(
             request,
             username=username,
             password=password
         )
 
-
-        # ----------------------------------------------------
-        # INVALID LOGIN
-        # ----------------------------------------------------
 
         if user is None:
 
@@ -319,33 +370,74 @@ def login_view(request):
 
             return render(
                 request,
-                'login.html'
+                'login.html',
+                {
+                    'selected_role': selected_role
+                }
             )
 
 
         # ----------------------------------------------------
-        # ADMIN
+        # ADMIN LOGIN
         # ----------------------------------------------------
 
-        if user.is_superuser:
+        if role == 'admin':
 
-            login(request, user)
+            if not user.is_superuser:
+
+                messages.error(
+                    request,
+                    'This account is not an Administrator account.'
+                )
+
+                return render(
+                    request,
+                    'login.html',
+                    {
+                        'selected_role': selected_role
+                    }
+                )
+
+            login(
+                request,
+                user
+            )
 
             messages.success(
                 request,
                 'Welcome, Administrator!'
             )
 
-            return redirect('admin_dashboard')
+            return redirect(
+                'admin_dashboard'
+            )
 
 
         # ----------------------------------------------------
-        # STAFF
+        # STAFF LOGIN
         # ----------------------------------------------------
 
-        try:
+        if role == 'staff':
 
-            staff = user.staff_profile
+            try:
+
+                staff = user.staff_profile
+
+            except Staff.DoesNotExist:
+
+                messages.error(
+                    request,
+                    'This account is not a Staff account.'
+                )
+
+                return render(
+                    request,
+                    'login.html',
+                    {
+                        'selected_role': selected_role
+                    }
+                )
+
 
             if not staff.is_active:
 
@@ -356,10 +448,17 @@ def login_view(request):
 
                 return render(
                     request,
-                    'login.html'
+                    'login.html',
+                    {
+                        'selected_role': selected_role
+                    }
                 )
 
-            login(request, user)
+
+            login(
+                request,
+                user
+            )
 
             messages.success(
                 request,
@@ -367,21 +466,41 @@ def login_view(request):
                 f'{user.first_name or user.username}!'
             )
 
-            return redirect('staff_dashboard')
-
-        except Staff.DoesNotExist:
-            pass
+            return redirect(
+                'staff_dashboard'
+            )
 
 
         # ----------------------------------------------------
-        # CUSTOMER
+        # CUSTOMER LOGIN
         # ----------------------------------------------------
 
-        try:
+        if role == 'customer':
 
-            user.customer_profile
+            try:
 
-            login(request, user)
+                user.customer_profile
+
+            except Customer.DoesNotExist:
+
+                messages.error(
+                    request,
+                    'This account is not a Customer account.'
+                )
+
+                return render(
+                    request,
+                    'login.html',
+                    {
+                        'selected_role': selected_role
+                    }
+                )
+
+
+            login(
+                request,
+                user
+            )
 
             messages.success(
                 request,
@@ -389,25 +508,21 @@ def login_view(request):
                 f'{user.first_name or user.username}!'
             )
 
-            return redirect('home')
+            return redirect(
+                'home'
+            )
 
-        except Customer.DoesNotExist:
-            pass
 
-
-        # ----------------------------------------------------
-        # UNKNOWN ROLE
-        # ----------------------------------------------------
-
-        messages.error(
-            request,
-            'This account does not have a valid system role.'
-        )
-
+    # --------------------------------------------------------
+    # GET REQUEST
+    # --------------------------------------------------------
 
     return render(
         request,
-        'login.html'
+        'login.html',
+        {
+            'selected_role': selected_role
+        }
     )
 
 
@@ -568,10 +683,316 @@ def order_success(request, order_id):
 # RESERVATION
 # ============================================================
 
+@login_required
 def reservation(request):
+
+    from django.utils import timezone
+    from datetime import datetime
+
+    today = timezone.localdate()
+
+    # Show currently available tables
+    tables = RestaurantTable.objects.filter(
+        is_available=True
+    ).order_by(
+        'table_number'
+    )
+
+    context = {
+        'tables': tables,
+        'today': today.strftime('%Y-%m-%d'),
+    }
+
+    if request.method == 'POST':
+
+        reservation_date = request.POST.get(
+            'reservation_date',
+            ''
+        )
+
+        reservation_time = request.POST.get(
+            'reservation_time',
+            ''
+        )
+
+        number_of_guests = request.POST.get(
+            'number_of_guests',
+            ''
+        )
+
+        table_id = request.POST.get(
+            'table',
+            ''
+        )
+
+        special_request = request.POST.get(
+            'special_request',
+            ''
+        ).strip()
+
+        action = request.POST.get(
+            'action',
+            ''
+        )
+
+        # ----------------------------------------------------
+        # VALIDATION
+        # ----------------------------------------------------
+
+        if not all([
+            reservation_date,
+            reservation_time,
+            number_of_guests,
+            table_id
+        ]):
+
+            messages.error(
+                request,
+                'Please complete all required reservation fields.'
+            )
+
+            context.update({
+                'selected_date': reservation_date,
+                'selected_time': reservation_time,
+                'selected_guests': number_of_guests,
+                'selected_table_id': table_id,
+                'special_request': special_request,
+            })
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        try:
+
+            selected_date = datetime.strptime(
+                reservation_date,
+                '%Y-%m-%d'
+            ).date()
+
+            selected_time = datetime.strptime(
+                reservation_time,
+                '%H:%M'
+            ).time()
+
+            guests = int(number_of_guests)
+
+        except (ValueError, TypeError):
+
+            messages.error(
+                request,
+                'Invalid reservation information.'
+            )
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # Date cannot be in the past
+        if selected_date < today:
+
+            messages.error(
+                request,
+                'Reservation date cannot be in the past.'
+            )
+
+            context.update({
+                'selected_date': reservation_date,
+                'selected_time': reservation_time,
+                'selected_guests': number_of_guests,
+                'selected_table_id': table_id,
+                'special_request': special_request,
+            })
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # Number of guests must be positive
+        if guests < 1:
+
+            messages.error(
+                request,
+                'Number of guests must be at least 1.'
+            )
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # ----------------------------------------------------
+        # FIND TABLE
+        # ----------------------------------------------------
+
+        try:
+
+            selected_table = RestaurantTable.objects.get(
+                id=table_id
+            )
+
+        except RestaurantTable.DoesNotExist:
+
+            messages.error(
+                request,
+                'Selected table does not exist.'
+            )
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # Check whether the table is currently available
+        if not selected_table.is_available:
+
+            messages.error(
+                request,
+                'This table is currently unavailable.'
+            )
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # Check table capacity
+        if selected_table.capacity < guests:
+
+            messages.error(
+                request,
+                f'Table {selected_table.table_number} can only '
+                f'accommodate {selected_table.capacity} people.'
+            )
+
+            context.update({
+                'selected_date': reservation_date,
+                'selected_time': reservation_time,
+                'selected_guests': number_of_guests,
+                'selected_table_id': table_id,
+                'special_request': special_request,
+            })
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # ----------------------------------------------------
+        # CHECK EXISTING RESERVATION
+        # ----------------------------------------------------
+
+        existing_reservation = Reservation.objects.filter(
+            table=selected_table,
+            reservation_date=selected_date,
+            reservation_time=selected_time,
+            status__in=[
+                'Pending',
+                'Confirmed'
+            ]
+        ).exists()
+
+        if existing_reservation:
+
+            messages.error(
+                request,
+                'This table is already reserved for the selected '
+                'date and time.'
+            )
+
+            context.update({
+                'selected_date': reservation_date,
+                'selected_time': reservation_time,
+                'selected_guests': number_of_guests,
+                'selected_table_id': table_id,
+                'special_request': special_request,
+            })
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # ----------------------------------------------------
+        # CHECK AVAILABILITY
+        # ----------------------------------------------------
+
+        if action == 'check':
+
+            messages.success(
+                request,
+                f'Table {selected_table.table_number} is available '
+                f'for {guests} people on '
+                f'{selected_date.strftime("%d %b %Y")} at '
+                f'{selected_time.strftime("%I:%M %p")}.'
+            )
+
+            context.update({
+                'selected_date': reservation_date,
+                'selected_time': reservation_time,
+                'selected_guests': number_of_guests,
+                'selected_table_id': table_id,
+                'special_request': special_request,
+            })
+
+            return render(
+                request,
+                'reservation.html',
+                context
+            )
+
+        # ----------------------------------------------------
+        # BOOK TABLE
+        # ----------------------------------------------------
+
+        if action == 'book':
+
+            try:
+
+                customer = request.user.customer_profile
+
+            except Customer.DoesNotExist:
+
+                messages.error(
+                    request,
+                    'Customer profile not found.'
+                )
+
+                return redirect('register')
+
+            Reservation.objects.create(
+                customer=customer,
+                table=selected_table,
+                reservation_date=selected_date,
+                reservation_time=selected_time,
+                number_of_guests=guests,
+                status='Pending',
+                special_request=special_request,
+            )
+
+            messages.success(
+                request,
+                'Your reservation request has been submitted. '
+                'Please wait for admin confirmation.'
+            )
+
+            return redirect('reservation')
+
     return render(
         request,
-        'reservation.html'
+        'reservation.html',
+        context
     )
 
 

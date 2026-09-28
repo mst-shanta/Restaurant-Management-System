@@ -157,24 +157,57 @@
                     </li>
 
 
-                {% else %}
+{% else %}
 
+    <!-- LOGIN DROPDOWN -->
 
-                    <!-- LOGIN -->
+    <li class="nav-item dropdown">
 
-                    <li class="nav-item">
+        <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="loginDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
+            Login
+        </a>
 
-                        <a
-                            class="nav-link"
-                            href="{% url 'login' %}"
-                        >
-                            Login
-                        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
 
-                    </li>
+            <li>
+                <a
+                    class="dropdown-item"
+                    href="{% url 'login' %}?role=customer"
+                >
+                    Customer Login
+                </a>
+            </li>
 
+            <li>
+                <a
+                    class="dropdown-item"
+                    href="{% url 'login' %}?role=staff"
+                >
+                    Staff Login
+                </a>
+            </li>
 
-                {% endif %}
+            <li>
+                <a
+                    class="dropdown-item"
+                    href="{% url 'login' %}?role=admin"
+                >
+                    Administrator Login
+                </a>
+            </li>
+
+        </ul>
+
+    </li>
+
+{% endif %}
 
 
             </ul>
@@ -189,6 +222,34 @@
 <!-- MAIN CONTENT -->
 
 <main>
+
+    {% if messages %}
+
+        <div class="container mt-3">
+
+            {% for message in messages %}
+
+                <div
+                    class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
 
     {% block content %}
     {% endblock %}

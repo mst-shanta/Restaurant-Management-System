@@ -10,35 +10,79 @@ Login | Restaurant Management System
 
     <div class="row justify-content-center">
 
-        <div class="col-md-5">
+        <div class="col-md-6 col-lg-5">
 
-            <div class="card shadow-sm">
+            <div class="card border-0 shadow-sm">
 
-                <div class="card-body p-4">
+                <div class="card-body p-5">
 
-                    <h2>Login</h2>
+                    <div class="text-center mb-4">
 
+                        <h2 class="fw-bold">
+                            Login
+                        </h2>
 
-                    {% if messages %}
+                        <p class="text-muted">
+                            Login to your account
+                        </p>
 
-                        {% for message in messages %}
-
-                            <div class="alert alert-{{ message.tags }}">
-                                {{ message }}
-                            </div>
-
-                        {% endfor %}
-
-                    {% endif %}
+                    </div>
 
 
                     <form method="POST">
 
                         {% csrf_token %}
 
-                        <div class="mb-3">
 
-                            <label class="form-label">
+                        <!-- Role -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Login As
+                            </label>
+
+                            <select
+                                name="role"
+                                class="form-select"
+                                required
+                            >
+
+<option value="">
+    Select your role
+</option>
+
+<option
+    value="customer"
+    {% if selected_role == 'customer' %}selected{% endif %}
+>
+    Customer
+</option>
+
+<option
+    value="staff"
+    {% if selected_role == 'staff' %}selected{% endif %}
+>
+    Staff
+</option>
+
+<option
+    value="admin"
+    {% if selected_role == 'admin' %}selected{% endif %}
+>
+    Administrator
+</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Username -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
                                 Username
                             </label>
 
@@ -46,15 +90,18 @@ Login | Restaurant Management System
                                 type="text"
                                 name="username"
                                 class="form-control"
+                                placeholder="Enter your username"
                                 required
                             >
 
                         </div>
 
 
+                        <!-- Password -->
+
                         <div class="mb-4">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Password
                             </label>
 
@@ -62,31 +109,39 @@ Login | Restaurant Management System
                                 type="password"
                                 name="password"
                                 class="form-control"
+                                placeholder="Enter your password"
                                 required
                             >
 
                         </div>
 
 
-                        <button
-                            type="submit"
-                            class="btn btn-primary w-100"
-                        >
-                            Login
-                        </button>
+                        <!-- Login -->
+
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg"
+                            >
+                                Login
+                            </button>
+
+                        </div>
 
                     </form>
 
 
-                    <p class="text-center mt-3 mb-0">
+                    <div class="text-center mt-4">
 
-                        Don't have an account?
+                        <p class="text-muted mb-0">
+                            Don't have an account?
+                            <a href="{% url 'register' %}">
+                                Register
+                            </a>
+                        </p>
 
-                        <a href="{% url 'register' %}">
-                            Register
-                        </a>
-
-                    </p>
+                    </div>
 
                 </div>
 
