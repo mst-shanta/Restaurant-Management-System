@@ -21,38 +21,6 @@ Reservation | Restaurant Management System
     </div>
 
 
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-
-                {{ message }}
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-                </button>
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-
-    {% if availability_message %}
-
-        <div class="alert alert-{{ availability_type }} mb-4">
-
-            {{ availability_message }}
-
-        </div>
-
-    {% endif %}
-
-
     <div class="row justify-content-center">
 
         <div class="col-lg-8">
@@ -127,13 +95,9 @@ Reservation | Restaurant Management System
 
                                     <option
                                         value="{{ forloop.counter }}"
-                                        {% if selected_guests == forloop.counter|stringformat:"i" %}
-                                            selected
-                                        {% endif %}
+                                        {% if selected_guests == forloop.counter %}selected{% endif %}
                                     >
-
                                         {{ forloop.counter }}
-
                                     </option>
 
                                 {% endfor %}
@@ -161,34 +125,25 @@ Reservation | Restaurant Management System
                                     Select a table
                                 </option>
 
-
                                 {% for table in tables %}
 
                                     <option
                                         value="{{ table.id }}"
-                                        {% if selected_table_id == table.id|stringformat:"i" %}
-                                            selected
-                                        {% endif %}
+                                        {% if selected_table_id == table.id %}selected{% endif %}
                                     >
-
                                         Table {{ table.table_number }}
                                         — {{ table.capacity }} Seats
-
                                     </option>
 
                                 {% empty %}
 
                                     <option value="">
-                                        No suitable tables currently available
+                                        No tables currently available
                                     </option>
 
                                 {% endfor %}
 
                             </select>
-
-                            <small class="text-muted">
-                                Only tables that can accommodate your group are shown.
-                            </small>
 
                         </div>
 
@@ -198,13 +153,10 @@ Reservation | Restaurant Management System
                         <div class="mb-4">
 
                             <label class="form-label fw-semibold">
-
                                 Special Request
-
                                 <span class="text-muted fw-normal">
                                     (Optional)
                                 </span>
-
                             </label>
 
                             <textarea
@@ -227,9 +179,7 @@ Reservation | Restaurant Management System
                                 value="check"
                                 class="btn btn-outline-primary btn-lg"
                             >
-
                                 Check Availability
-
                             </button>
 
                         </div>
@@ -245,9 +195,7 @@ Reservation | Restaurant Management System
                                 value="book"
                                 class="btn btn-primary btn-lg"
                             >
-
                                 Book Table
-
                             </button>
 
                         </div>

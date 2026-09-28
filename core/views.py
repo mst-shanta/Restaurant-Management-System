@@ -6,7 +6,6 @@ from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-from django.utils import timezone
 
 from .models import *
 
@@ -569,285 +568,10 @@ def order_success(request, order_id):
 # RESERVATION
 # ============================================================
 
-@login_required
 def reservation(request):
-
-    today = timezone.localdate()
-
-    selected_date = request.POST.get(
-        'reservation_date',
-        ''
-    )
-
-    selected_time = request.POST.get(
-        'reservation_time',
-        ''
-    )
-
-    selected_guests = request.POST.get(
-        'number_of_guests',
-        ''
-    )
-
-    selected_table_id = request.POST.get(
-        'table',
-        ''
-    )
-
-    special_request = request.POST.get(
-        'special_request',
-        ''
-    )
-
-    availability_message = None
-    availability_type = None
-
-    # --------------------------------------------------------
-    # AVAILABLE TABLES
-    # --------------------------------------------------------
-
-    tables = RestaurantTable.objects.filter(
-        is_available=True
-    ).order_by(
-        'table_number'
-    )
-
-    # If guests are selected, only show tables large enough
-    if selected_guests:
-
-        try:
-            guests = int(selected_guests)
-
-            tables = tables.filter(
-                capacity__gte=guests
-            )
-
-        except (TypeError, ValueError):
-            guests = None
-
-    else:
-        guests = None
-
-
-    # --------------------------------------------------------
-    # CHECK / BOOK
-    # --------------------------------------------------------
-
-    if request.method == 'POST':
-
-        action = request.POST.get(
-            'action'
-        )
-
-        # ----------------------------------------------------
-        # BASIC VALIDATION
-        # ----------------------------------------------------
-
-        if not selected_date or not selected_time or not selected_guests or not selected_table_id:
-
-            messages.error(
-                request,
-                'Please complete all required reservation fields.'
-            )
-
-            return render(
-                request,
-                'reservation.html',
-                {
-                    'today': today,
-                    'tables': tables,
-                    'selected_date': selected_date,
-                    'selected_time': selected_time,
-                    'selected_guests': selected_guests,
-                    'selected_table_id': selected_table_id,
-                    'special_request': special_request,
-                }
-            )
-
-
-        # ----------------------------------------------------
-        # VALIDATE GUEST NUMBER
-        # ----------------------------------------------------
-
-        try:
-            guests = int(selected_guests)
-
-        except (TypeError, ValueError):
-
-            messages.error(
-                request,
-                'Invalid number of guests.'
-            )
-
-            return redirect('reservation')
-
-
-        # ----------------------------------------------------
-        # VALIDATE TABLE
-        # ----------------------------------------------------
-
-        table = get_object_or_404(
-            RestaurantTable,
-            id=selected_table_id
-        )
-
-
-        if not table.is_available:
-
-            availability_message = (
-                f'Table {table.table_number} is currently unavailable.'
-            )
-
-            availability_type = 'danger'
-
-        elif table.capacity < guests:
-
-            availability_message = (
-                f'Table {table.table_number} can accommodate only '
-                f'{table.capacity} people.'
-            )
-
-            availability_type = 'danger'
-
-        else:
-
-            # ------------------------------------------------
-            # CHECK EXISTING RESERVATIONS
-            # ------------------------------------------------
-
-            conflicting_reservation = Reservation.objects.filter(
-                table=table,
-                reservation_date=selected_date,
-                reservation_time=selected_time,
-                status__in=['Pending', 'Confirmed']
-            ).exists()
-
-
-            if conflicting_reservation:
-
-                availability_message = (
-                    f'Table {table.table_number} is already reserved '
-                    f'for {selected_date} at {selected_time}.'
-                )
-
-                availability_type = 'danger'
-
-            else:
-
-                availability_message = (
-                    f'Table {table.table_number} is available '
-                    f'for {guests} people.'
-                )
-
-                availability_type = 'success'
-
-
-        # ----------------------------------------------------
-        # CHECK AVAILABILITY ONLY
-        # ----------------------------------------------------
-
-        if action == 'check':
-
-            return render(
-                request,
-                'reservation.html',
-                {
-                    'today': today,
-                    'tables': tables,
-                    'selected_date': selected_date,
-                    'selected_time': selected_time,
-                    'selected_guests': selected_guests,
-                    'selected_table_id': selected_table_id,
-                    'special_request': special_request,
-                    'availability_message': availability_message,
-                    'availability_type': availability_type,
-                }
-            )
-
-
-        # ----------------------------------------------------
-        # BOOK TABLE
-        # ----------------------------------------------------
-
-        if action == 'book':
-
-            if availability_type != 'success':
-
-                messages.error(
-                    request,
-                    availability_message
-                )
-
-                return render(
-                    request,
-                    'reservation.html',
-                    {
-                        'today': today,
-                        'tables': tables,
-                        'selected_date': selected_date,
-                        'selected_time': selected_time,
-                        'selected_guests': selected_guests,
-                        'selected_table_id': selected_table_id,
-                        'special_request': special_request,
-                    }
-                )
-
-
-            try:
-
-                customer = request.user.customer_profile
-
-            except Customer.DoesNotExist:
-
-                messages.error(
-                    request,
-                    'Customer profile not found.'
-                )
-
-                return redirect('reservation')
-
-
-            # -----------------------------------------------
-            # CREATE RESERVATION
-            # -----------------------------------------------
-
-            Reservation.objects.create(
-                customer=customer,
-                table=table,
-                reservation_date=selected_date,
-                reservation_time=selected_time,
-                number_of_guests=guests,
-                status='Pending',
-                special_request=special_request,
-            )
-
-
-            messages.success(
-                request,
-                f'Reservation request submitted successfully for '
-                f'Table {table.table_number}. '
-                f'Your reservation is pending admin confirmation.'
-            )
-
-            return redirect('reservation')
-
-
-    # --------------------------------------------------------
-    # GET
-    # --------------------------------------------------------
-
     return render(
         request,
-        'reservation.html',
-        {
-            'today': today,
-            'tables': tables,
-            'selected_date': selected_date,
-            'selected_time': selected_time,
-            'selected_guests': selected_guests,
-            'selected_table_id': selected_table_id,
-            'special_request': special_request,
-        }
+        'reservation.html'
     )
 
 
@@ -913,126 +637,57 @@ def admin_dashboard(request):
 @login_required
 @require_POST
 def update_reservation_status(request, reservation_id, status):
-
     if not request.user.is_superuser:
-
-        messages.error(
-            request,
-            "You do not have permission to perform this action."
-        )
-
+        messages.error(request, "You do not have permission to perform this action.")
         return redirect('home')
-
 
     reservation = get_object_or_404(
         Reservation,
         id=reservation_id
     )
 
-
-    # ========================================================
-    # CONFIRM RESERVATION
-    # ========================================================
-
     if status == 'Confirmed':
 
-        if reservation.status != 'Pending':
+        # Find an available table that can accommodate the guests
+        available_table = RestaurantTable.objects.filter(
+            is_available=True,
+            capacity__gte=reservation.number_of_guests
+        ).order_by(
+            'capacity'
+        ).first()
 
-            messages.warning(
-                request,
-                'This reservation has already been processed.'
-            )
-
-            return redirect('admin_dashboard')
-
-
-        table = reservation.table
-
-
-        if table is None:
-
+        if not available_table:
             messages.error(
                 request,
-                'This reservation does not have a table assigned.'
+                "No available table can accommodate this reservation."
             )
-
             return redirect('admin_dashboard')
 
-
-        if not table.is_available:
-
-            messages.error(
-                request,
-                f'Table {table.table_number} is currently unavailable.'
-            )
-
-            return redirect('admin_dashboard')
-
-
-        # Check whether another reservation already uses
-        # this table at the same date and time.
-
-        conflict = Reservation.objects.filter(
-            table=table,
-            reservation_date=reservation.reservation_date,
-            reservation_time=reservation.reservation_time,
-            status='Confirmed'
-        ).exclude(
-            id=reservation.id
-        ).exists()
-
-
-        if conflict:
-
-            messages.error(
-                request,
-                f'Table {table.table_number} is already reserved '
-                f'for that date and time.'
-            )
-
-            return redirect('admin_dashboard')
-
-
+        reservation.table = available_table
         reservation.status = 'Confirmed'
         reservation.save()
 
-
-        table.is_available = False
-        table.save()
-
+        available_table.is_available = False
+        available_table.save()
 
         messages.success(
             request,
-            f'Reservation for '
-            f'{reservation.customer.user.get_full_name() or reservation.customer.user.username} '
-            f'has been confirmed.'
+            f"Reservation for {reservation.customer.user.get_full_name() or reservation.customer.user.username} has been confirmed."
         )
-
-
-    # ========================================================
-    # REJECT RESERVATION
-    # ========================================================
 
     elif status == 'Cancelled':
 
-        if reservation.status != 'Pending':
-
-            messages.warning(
-                request,
-                'This reservation has already been processed.'
-            )
-
-            return redirect('admin_dashboard')
-
+        # If the reservation already had a table, make it available again
+        if reservation.table:
+            reservation.table.is_available = True
+            reservation.table.save()
 
         reservation.status = 'Cancelled'
         reservation.save()
 
-
         messages.success(
             request,
-            'Reservation has been rejected.'
+            "Reservation has been rejected."
         )
-
 
     return redirect('admin_dashboard')
