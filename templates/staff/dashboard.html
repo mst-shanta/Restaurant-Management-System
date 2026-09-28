@@ -8,17 +8,115 @@ Staff Dashboard | Restaurant Management System
 
 <div class="container py-5">
 
+    <!-- Header -->
+
     <div class="mb-5">
-        <h1 class="fw-bold">Staff Dashboard</h1>
+
+        <h1 class="fw-bold">
+            Staff Dashboard
+        </h1>
+
         <p class="text-muted">
+            Welcome back,
+            {{ staff.user.first_name|default:staff.user.username }}.
             View your work schedule, salary and performance information.
         </p>
+
+    </div>
+
+
+    <!-- Messages -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+
+                {{ message }}
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- Staff Information -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <p class="text-muted mb-1">
+                        Name
+                    </p>
+
+                    <h5 class="fw-bold">
+                        {{ staff.user.get_full_name|default:staff.user.username }}
+                    </h5>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <p class="text-muted mb-1">
+                        Position
+                    </p>
+
+                    <h5 class="fw-bold">
+                        {{ staff.position }}
+                    </h5>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <p class="text-muted mb-1">
+                        Employment Status
+                    </p>
+
+                    {% if staff.is_active %}
+
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Inactive
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
 
     <!-- Summary Cards -->
 
     <div class="row g-4 mb-5">
+
+
+        <!-- Salary -->
 
         <div class="col-md-4">
 
@@ -30,13 +128,37 @@ Staff Dashboard | Restaurant Management System
                         This Month's Salary
                     </h6>
 
-                    <h2 class="fw-bold mt-2">
-                        ৳25,000
-                    </h2>
+                    {% if current_salary %}
 
-                    <span class="badge bg-success">
-                        Updated
-                    </span>
+                        <h2 class="fw-bold mt-2">
+                            ৳{{ current_salary.amount|floatformat:0 }}
+                        </h2>
+
+                        {% if current_salary.is_paid %}
+
+                            <span class="badge bg-success">
+                                Paid
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <h2 class="fw-bold mt-2">
+                            ৳0
+                        </h2>
+
+                        <span class="badge bg-secondary">
+                            Not updated
+                        </span>
+
+                    {% endif %}
 
                 </div>
 
@@ -44,6 +166,8 @@ Staff Dashboard | Restaurant Management System
 
         </div>
 
+
+        <!-- Performance -->
 
         <div class="col-md-4">
 
@@ -52,16 +176,30 @@ Staff Dashboard | Restaurant Management System
                 <div class="card-body">
 
                     <h6 class="text-muted">
-                        Performance Rate
+                        Latest Performance Score
                     </h6>
 
-                    <h2 class="fw-bold mt-2">
-                        92%
-                    </h2>
+                    {% if latest_performance %}
 
-                    <span class="badge bg-primary">
-                        Excellent
-                    </span>
+                        <h2 class="fw-bold mt-2">
+                            {{ latest_performance.score }}%
+                        </h2>
+
+                        <span class="badge bg-primary">
+                            Evaluated
+                        </span>
+
+                    {% else %}
+
+                        <h2 class="fw-bold mt-2">
+                            —
+                        </h2>
+
+                        <span class="badge bg-secondary">
+                            Not evaluated
+                        </span>
+
+                    {% endif %}
 
                 </div>
 
@@ -69,6 +207,8 @@ Staff Dashboard | Restaurant Management System
 
         </div>
 
+
+        <!-- Status -->
 
         <div class="col-md-4">
 
@@ -81,12 +221,28 @@ Staff Dashboard | Restaurant Management System
                     </h6>
 
                     <h2 class="fw-bold mt-2">
-                        Active
+
+                        {% if staff.is_active %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+
                     </h2>
 
-                    <span class="badge bg-success">
-                        Working
-                    </span>
+                    {% if staff.is_active %}
+
+                        <span class="badge bg-success">
+                            Working
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Inactive
+                        </span>
+
+                    {% endif %}
 
                 </div>
 
@@ -97,15 +253,20 @@ Staff Dashboard | Restaurant Management System
     </div>
 
 
-    <!-- Schedule -->
+    <!-- Work Schedule -->
 
     <div class="card border-0 shadow-sm">
 
         <div class="card-body p-4">
 
-            <h4 class="mb-4">
-                My Work Schedule
-            </h4>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0">
+                    My Work Schedule
+                </h4>
+
+            </div>
+
 
             <div class="table-responsive">
 
@@ -114,70 +275,88 @@ Staff Dashboard | Restaurant Management System
                     <thead class="table-light">
 
                         <tr>
-                            <th>Day</th>
-                            <th>Date</th>
-                            <th>Shift</th>
-                            <th>Status</th>
+
+                            <th>
+                                Day
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Shift
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
                         </tr>
 
                     </thead>
 
+
                     <tbody>
 
-                        <tr>
-                            <td>Monday</td>
-                            <td>14 Sep 2026</td>
-                            <td>10:00 AM – 6:00 PM</td>
-                            <td>
-                                <span class="badge bg-success">
-                                    Scheduled
-                                </span>
-                            </td>
-                        </tr>
+                        {% for schedule in schedules %}
 
                         <tr>
-                            <td>Tuesday</td>
-                            <td>15 Sep 2026</td>
-                            <td>10:00 AM – 6:00 PM</td>
+
                             <td>
-                                <span class="badge bg-success">
-                                    Scheduled
-                                </span>
+                                {{ schedule.date|date:"l" }}
                             </td>
+
+                            <td>
+                                {{ schedule.date|date:"d M Y" }}
+                            </td>
+
+                            <td>
+                                {{ schedule.start_time|time:"g:i A" }}
+                                –
+                                {{ schedule.end_time|time:"g:i A" }}
+                            </td>
+
+                            <td>
+
+                                {% if schedule.status == "Scheduled" %}
+
+                                    <span class="badge bg-success">
+                                        {{ schedule.status }}
+                                    </span>
+
+                                {% elif schedule.status == "Day Off" %}
+
+                                    <span class="badge bg-secondary">
+                                        {{ schedule.status }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-primary">
+                                        {{ schedule.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
                         </tr>
 
-                        <tr>
-                            <td>Wednesday</td>
-                            <td>16 Sep 2026</td>
-                            <td>12:00 PM – 8:00 PM</td>
-                            <td>
-                                <span class="badge bg-success">
-                                    Scheduled
-                                </span>
-                            </td>
-                        </tr>
+                        {% empty %}
 
                         <tr>
-                            <td>Thursday</td>
-                            <td>17 Sep 2026</td>
-                            <td>OFF</td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    Day Off
-                                </span>
+
+                            <td
+                                colspan="4"
+                                class="text-center text-muted py-4"
+                            >
+                                No upcoming schedules available.
                             </td>
+
                         </tr>
 
-                        <tr>
-                            <td>Friday</td>
-                            <td>18 Sep 2026</td>
-                            <td>4:00 PM – 10:00 PM</td>
-                            <td>
-                                <span class="badge bg-success">
-                                    Scheduled
-                                </span>
-                            </td>
-                        </tr>
+                        {% endfor %}
 
                     </tbody>
 

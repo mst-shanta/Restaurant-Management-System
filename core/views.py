@@ -1000,12 +1000,84 @@ def reservation(request):
 # STAFF DASHBOARD
 # ============================================================
 
+# ============================================================
+# STAFF DASHBOARD
+# ============================================================
+
+@login_required
 def staff_dashboard(request):
-    return render(
-        request,
-        'staff/dashboard.html'
+
+    # Make sure the logged-in user is a staff member
+    try:
+        staff = request.user.staff_profile
+
+    except Staff.DoesNotExist:
+
+        messages.error(
+            request,
+            'Staff profile not found.'
+        )
+
+        return redirect('home')
+
+
+    from django.utils import timezone
+
+    today = timezone.localdate()
+
+
+    # --------------------------------------------------------
+    # CURRENT MONTH SALARY
+    # --------------------------------------------------------
+
+    current_salary = Salary.objects.filter(
+        staff=staff,
+        month=today.month,
+        year=today.year
+    ).first()
+
+
+    # --------------------------------------------------------
+    # LATEST PERFORMANCE
+    # --------------------------------------------------------
+
+    latest_performance = Performance.objects.filter(
+        staff=staff
+    ).order_by(
+        '-evaluation_date'
+    ).first()
+
+
+    # --------------------------------------------------------
+    # WORK SCHEDULE
+    # --------------------------------------------------------
+
+    schedules = Schedule.objects.filter(
+        staff=staff,
+        date__gte=today
+    ).order_by(
+        'date',
+        'start_time'
     )
 
+
+    # --------------------------------------------------------
+    # CONTEXT
+    # --------------------------------------------------------
+
+    context = {
+        'staff': staff,
+        'current_salary': current_salary,
+        'latest_performance': latest_performance,
+        'schedules': schedules,
+    }
+
+
+    return render(
+        request,
+        'staff/dashboard.html',
+        context
+    )
 
 # ============================================================
 # ADMIN DASHBOARD
