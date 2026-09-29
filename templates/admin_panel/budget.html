@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+
+{% block title %}Budget Management | Restaurant Management System{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="fw-bold mb-1">Budget Management</h1>
+            <p class="text-muted mb-0">
+                Manage monthly restaurant budgets.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+
+    <!-- MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <!-- ADD BUDGET -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body p-4">
+
+            <h4 class="mb-4">Add Monthly Budget</h4>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <input type="hidden"
+                       name="action"
+                       value="add">
+
+                <div class="row g-3">
+
+                    <!-- MONTH -->
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Month
+                        </label>
+
+                        <select name="month"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                Select Month
+                            </option>
+
+                            {% for number, name in month_names %}
+                                <option value="{{ number }}"
+                                    {% if number == current_month %}
+                                        selected
+                                    {% endif %}>
+                                    {{ name }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- YEAR -->
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Year
+                        </label>
+
+                        <input type="number"
+                               name="year"
+                               class="form-control"
+                               value="{{ current_year }}"
+                               min="2000"
+                               required>
+
+                    </div>
+
+
+                    <!-- AMOUNT -->
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Budget Amount
+                        </label>
+
+                        <input type="number"
+                               name="amount"
+                               class="form-control"
+                               min="0"
+                               step="0.01"
+                               placeholder="250000"
+                               required>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+                    <div class="col-md-3 d-flex align-items-end">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Add Budget
+                        </button>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="2"
+                                  placeholder="Monthly operational budget..."></textarea>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- BUDGET LIST -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0">
+                    Monthly Budgets
+                </h4>
+
+                <span class="badge bg-primary">
+                    {{ budgets|length }} Records
+                </span>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Budget Amount</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for budget in budgets %}
+
+                        <tr>
+
+                            <td>
+                                {% if budget.month == 1 %}January
+                                {% elif budget.month == 2 %}February
+                                {% elif budget.month == 3 %}March
+                                {% elif budget.month == 4 %}April
+                                {% elif budget.month == 5 %}May
+                                {% elif budget.month == 6 %}June
+                                {% elif budget.month == 7 %}July
+                                {% elif budget.month == 8 %}August
+                                {% elif budget.month == 9 %}September
+                                {% elif budget.month == 10 %}October
+                                {% elif budget.month == 11 %}November
+                                {% elif budget.month == 12 %}December
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ budget.year }}
+                            </td>
+
+                            <td class="fw-bold">
+                                ৳{{ budget.amount|floatformat:2 }}
+                            </td>
+
+                            <td>
+                                {% if budget.description %}
+                                    {{ budget.description }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        No description
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editBudget{{ budget.id }}">
+                                    Edit
+                                </button>
+
+
+                                <form method="post"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete">
+
+                                    <input type="hidden"
+                                           name="budget_id"
+                                           value="{{ budget.id }}">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this budget?');">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EDIT MODAL -->
+                        <div class="modal fade"
+                             id="editBudget{{ budget.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Edit Budget
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form method="post">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="update">
+
+                                        <input type="hidden"
+                                               name="budget_id"
+                                               value="{{ budget.id }}">
+
+
+                                        <div class="modal-body">
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Month
+                                                </label>
+
+                                                <select name="month"
+                                                        class="form-select"
+                                                        required>
+
+                                                    {% for number, name in month_names %}
+
+                                                        <option value="{{ number }}"
+                                                            {% if number == budget.month %}
+                                                                selected
+                                                            {% endif %}>
+                                                            {{ name }}
+                                                        </option>
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Year
+                                                </label>
+
+                                                <input type="number"
+                                                       name="year"
+                                                       class="form-control"
+                                                       value="{{ budget.year }}"
+                                                       min="2000"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Budget Amount
+                                                </label>
+
+                                                <input type="number"
+                                                       name="amount"
+                                                       class="form-control"
+                                                       value="{{ budget.amount }}"
+                                                       min="0"
+                                                       step="0.01"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Description
+                                                </label>
+
+                                                <textarea name="description"
+                                                          class="form-control"
+                                                          rows="3">{{ budget.description }}</textarea>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center text-muted py-4">
+
+                                No budgets have been added yet.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

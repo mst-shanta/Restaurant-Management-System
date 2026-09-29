@@ -136,6 +136,30 @@ urlpatterns = [
     name='update_reservation_status'
 ),
 
+path(
+    'admin-panel/budget/',
+    budget_management,
+    name='budget_management'
+),
+
+path(
+    'admin-panel/tables/',
+    table_management,
+    name='table_management'
+),
+
+path(
+    'admin-panel/staff/',
+    staff_management,
+    name='staff_management'
+),
+
+path(
+    'admin-panel/menu/',
+    menu_management,
+    name='menu_management'
+),
+
 ]
 
 

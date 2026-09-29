@@ -1,0 +1,1990 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Management | Restaurant Management System{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+            <h1 class="fw-bold mb-1">Staff Management</h1>
+
+            <p class="text-muted mb-0">
+                Manage staff, schedules, salaries and performance.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- MESSAGES -->
+    <!-- ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+
+                {{ message }}
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- ADD STAFF -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <h4 class="mb-4">
+                Add Staff Member
+            </h4>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <input type="hidden"
+                       name="action"
+                       value="add">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Username
+                        </label>
+
+                        <input type="text"
+                               name="username"
+                               class="form-control"
+                               required>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            First Name
+                        </label>
+
+                        <input type="text"
+                               name="first_name"
+                               class="form-control">
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Last Name
+                        </label>
+
+                        <input type="text"
+                               name="last_name"
+                               class="form-control">
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Phone
+                        </label>
+
+                        <input type="text"
+                               name="phone"
+                               class="form-control">
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Position
+                        </label>
+
+                        <input type="text"
+                               name="position"
+                               class="form-control"
+                               placeholder="e.g. Waiter"
+                               required>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Joining Date
+                        </label>
+
+                        <input type="date"
+                               name="joining_date"
+                               class="form-control">
+
+                    </div>
+
+
+                    <div class="col-md-8">
+
+                        <label class="form-label">
+                            Password
+                        </label>
+
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               required>
+
+                    </div>
+
+
+                    <div class="col-md-4 d-flex align-items-end">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Add Staff
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- STAFF LIST -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0">
+                    Restaurant Staff
+                </h4>
+
+                <span class="badge bg-primary">
+                    {{ staff_members|length }} Staff
+                </span>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Staff</th>
+                            <th>Username</th>
+                            <th>Position</th>
+                            <th>Phone</th>
+                            <th>Joining Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for staff in staff_members %}
+
+                        <tr>
+
+                            <td class="fw-bold">
+
+                                {% if staff.user.get_full_name %}
+                                    {{ staff.user.get_full_name }}
+                                {% else %}
+                                    {{ staff.user.username }}
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ staff.user.username }}
+                            </td>
+
+
+                            <td>
+                                {{ staff.position }}
+                            </td>
+
+
+                            <td>
+
+                                {% if staff.phone %}
+                                    {{ staff.phone }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if staff.joining_date %}
+                                    {{ staff.joining_date|date:"d M Y" }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if staff.is_active %}
+
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editStaff{{ staff.id }}">
+                                    Edit
+                                </button>
+
+
+                                <form method="post"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete">
+
+                                    <input type="hidden"
+                                           name="staff_id"
+                                           value="{{ staff.id }}">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this staff member?');">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EDIT STAFF MODAL -->
+
+                        <div class="modal fade"
+                             id="editStaff{{ staff.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog modal-lg">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Edit Staff -
+                                            {{ staff.user.username }}
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form method="post">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="update">
+
+                                        <input type="hidden"
+                                               name="staff_id"
+                                               value="{{ staff.id }}">
+
+
+                                        <div class="modal-body">
+
+                                            <div class="row g-3">
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        First Name
+                                                    </label>
+
+                                                    <input type="text"
+                                                           name="first_name"
+                                                           class="form-control"
+                                                           value="{{ staff.user.first_name }}">
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Last Name
+                                                    </label>
+
+                                                    <input type="text"
+                                                           name="last_name"
+                                                           class="form-control"
+                                                           value="{{ staff.user.last_name }}">
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Phone
+                                                    </label>
+
+                                                    <input type="text"
+                                                           name="phone"
+                                                           class="form-control"
+                                                           value="{{ staff.phone }}">
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Position
+                                                    </label>
+
+                                                    <input type="text"
+                                                           name="position"
+                                                           class="form-control"
+                                                           value="{{ staff.position }}"
+                                                           required>
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Joining Date
+                                                    </label>
+
+                                                    <input type="date"
+                                                           name="joining_date"
+                                                           class="form-control"
+                                                           value="{{ staff.joining_date|date:'Y-m-d' }}">
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Status
+                                                    </label>
+
+                                                    <select name="is_active"
+                                                            class="form-select">
+
+                                                        <option value="True"
+                                                            {% if staff.is_active %}
+                                                                selected
+                                                            {% endif %}>
+                                                            Active
+                                                        </option>
+
+                                                        <option value="False"
+                                                            {% if not staff.is_active %}
+                                                                selected
+                                                            {% endif %}>
+                                                            Inactive
+                                                        </option>
+
+                                                    </select>
+
+                                                </div>
+
+
+                                                <div class="col-12">
+
+                                                    <label class="form-label">
+                                                        New Password
+                                                        <small class="text-muted">
+                                                            (leave blank to keep current password)
+                                                        </small>
+                                                    </label>
+
+                                                    <input type="password"
+                                                           name="password"
+                                                           class="form-control">
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SCHEDULE MANAGEMENT -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h4 class="mb-1">
+                        Schedule Management
+                    </h4>
+
+                    <p class="text-muted mb-0">
+                        Assign and manage staff work schedules.
+                    </p>
+
+                </div>
+
+                <span class="badge bg-primary">
+                    {{ schedules|length }} Schedules
+                </span>
+
+            </div>
+
+
+            <!-- ADD SCHEDULE -->
+
+            <div class="border rounded p-4 mb-4">
+
+                <h5 class="mb-4">
+                    Add Schedule
+                </h5>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <input type="hidden"
+                           name="action"
+                           value="add_schedule">
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Staff Member
+                            </label>
+
+                            <select name="staff"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select Staff
+                                </option>
+
+                                {% for staff in staff_members %}
+
+                                    <option value="{{ staff.id }}">
+
+                                        {% if staff.user.get_full_name %}
+                                            {{ staff.user.get_full_name }}
+                                        {% else %}
+                                            {{ staff.user.username }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Date
+                            </label>
+
+                            <input type="date"
+                                   name="date"
+                                   class="form-control"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select name="status"
+                                    class="form-select">
+
+                                <option value="Scheduled">
+                                    Scheduled
+                                </option>
+
+                                <option value="Leave">
+                                    Leave
+                                </option>
+
+                                <option value="Off">
+                                    Off
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Start Time
+                            </label>
+
+                            <input type="time"
+                                   name="start_time"
+                                   class="form-control"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                End Time
+                            </label>
+
+                            <input type="time"
+                                   name="end_time"
+                                   class="form-control"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4 d-flex align-items-end">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Add Schedule
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- SCHEDULE TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Staff</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for schedule in schedules %}
+
+                        <tr>
+
+                            <td class="fw-bold">
+
+                                {% if schedule.staff.user.get_full_name %}
+                                    {{ schedule.staff.user.get_full_name }}
+                                {% else %}
+                                    {{ schedule.staff.user.username }}
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ schedule.date|date:"d M Y" }}
+                            </td>
+
+
+                            <td>
+                                {{ schedule.start_time|time:"g:i A" }}
+                                –
+                                {{ schedule.end_time|time:"g:i A" }}
+                            </td>
+
+
+                            <td>
+
+                                {% if schedule.status == 'Scheduled' %}
+
+                                    <span class="badge bg-primary">
+                                        Scheduled
+                                    </span>
+
+                                {% elif schedule.status == 'Leave' %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Leave
+                                    </span>
+
+                                {% elif schedule.status == 'Off' %}
+
+                                    <span class="badge bg-secondary">
+                                        Off
+                                    </span>
+
+                                {% elif schedule.status == 'Completed' %}
+
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        {{ schedule.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editSchedule{{ schedule.id }}">
+                                    Edit
+                                </button>
+
+
+                                <form method="post"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete_schedule">
+
+                                    <input type="hidden"
+                                           name="schedule_id"
+                                           value="{{ schedule.id }}">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this schedule?');">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EDIT SCHEDULE MODAL -->
+
+                        <div class="modal fade"
+                             id="editSchedule{{ schedule.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Edit Schedule
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form method="post">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="update_schedule">
+
+                                        <input type="hidden"
+                                               name="schedule_id"
+                                               value="{{ schedule.id }}">
+
+
+                                        <div class="modal-body">
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Staff Member
+                                                </label>
+
+                                                <select name="staff"
+                                                        class="form-select"
+                                                        required>
+
+                                                    {% for staff in staff_members %}
+
+                                                        <option value="{{ staff.id }}"
+                                                            {% if staff.id == schedule.staff.id %}
+                                                                selected
+                                                            {% endif %}>
+
+                                                            {% if staff.user.get_full_name %}
+                                                                {{ staff.user.get_full_name }}
+                                                            {% else %}
+                                                                {{ staff.user.username }}
+                                                            {% endif %}
+
+                                                        </option>
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Date
+                                                </label>
+
+                                                <input type="date"
+                                                       name="date"
+                                                       class="form-control"
+                                                       value="{{ schedule.date|date:'Y-m-d' }}"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="row">
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Start Time
+                                                    </label>
+
+                                                    <input type="time"
+                                                           name="start_time"
+                                                           class="form-control"
+                                                           value="{{ schedule.start_time|time:'H:i' }}"
+                                                           required>
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        End Time
+                                                    </label>
+
+                                                    <input type="time"
+                                                           name="end_time"
+                                                           class="form-control"
+                                                           value="{{ schedule.end_time|time:'H:i' }}"
+                                                           required>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="mt-3">
+
+                                                <label class="form-label">
+                                                    Status
+                                                </label>
+
+                                                <select name="status"
+                                                        class="form-select">
+
+                                                    <option value="Scheduled"
+                                                        {% if schedule.status == 'Scheduled' %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Scheduled
+                                                    </option>
+
+                                                    <option value="Leave"
+                                                        {% if schedule.status == 'Leave' %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Leave
+                                                    </option>
+
+                                                    <option value="Off"
+                                                        {% if schedule.status == 'Off' %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Off
+                                                    </option>
+
+                                                    <option value="Completed"
+                                                        {% if schedule.status == 'Completed' %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Completed
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center text-muted py-4">
+
+                                No staff schedules have been added yet.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SALARY MANAGEMENT -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-5">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h4 class="mb-1">
+                        Salary Management
+                    </h4>
+
+                    <p class="text-muted mb-0">
+                        Manage monthly staff salaries and payment status.
+                    </p>
+
+                </div>
+
+                <span class="badge bg-primary">
+                    {{ salaries|length }} Records
+                </span>
+
+            </div>
+
+
+            <!-- ADD SALARY -->
+
+            <div class="border rounded p-4 mb-4">
+
+                <h5 class="mb-4">
+                    Add Salary Record
+                </h5>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <input type="hidden"
+                           name="action"
+                           value="add_salary">
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Staff Member
+                            </label>
+
+                            <select name="staff"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select Staff
+                                </option>
+
+                                {% for staff in staff_members %}
+
+                                    <option value="{{ staff.id }}">
+
+                                        {% if staff.user.get_full_name %}
+                                            {{ staff.user.get_full_name }}
+                                        {% else %}
+                                            {{ staff.user.username }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Month
+                            </label>
+
+                            <select name="month"
+                                    class="form-select"
+                                    required>
+
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9" selected>September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+                                Year
+                            </label>
+
+                            <input type="number"
+                                   name="year"
+                                   class="form-control"
+                                   value="2026"
+                                   min="2000"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Salary Amount
+                            </label>
+
+                            <input type="number"
+                                   name="amount"
+                                   class="form-control"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="25000"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Payment Date
+                            </label>
+
+                            <input type="date"
+                                   name="payment_date"
+                                   class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Payment Status
+                            </label>
+
+                            <select name="is_paid"
+                                    class="form-select">
+
+                                <option value="False">
+                                    Not Paid
+                                </option>
+
+                                <option value="True">
+                                    Paid
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-4 d-flex align-items-end">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Add Salary
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- SALARY TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Staff</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Amount</th>
+                            <th>Payment Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for salary in salaries %}
+
+                        <tr>
+
+                            <td class="fw-bold">
+
+                                {% if salary.staff.user.get_full_name %}
+                                    {{ salary.staff.user.get_full_name }}
+                                {% else %}
+                                    {{ salary.staff.user.username }}
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if salary.month == 1 %}January
+                                {% elif salary.month == 2 %}February
+                                {% elif salary.month == 3 %}March
+                                {% elif salary.month == 4 %}April
+                                {% elif salary.month == 5 %}May
+                                {% elif salary.month == 6 %}June
+                                {% elif salary.month == 7 %}July
+                                {% elif salary.month == 8 %}August
+                                {% elif salary.month == 9 %}September
+                                {% elif salary.month == 10 %}October
+                                {% elif salary.month == 11 %}November
+                                {% elif salary.month == 12 %}December
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ salary.year }}
+                            </td>
+
+
+                            <td class="fw-bold">
+                                ৳{{ salary.amount|floatformat:2 }}
+                            </td>
+
+
+                            <td>
+
+                                {% if salary.payment_date %}
+                                    {{ salary.payment_date|date:"d M Y" }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if salary.is_paid %}
+
+                                    <span class="badge bg-success">
+                                        Paid
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Not Paid
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editSalary{{ salary.id }}">
+                                    Edit
+                                </button>
+
+
+                                <form method="post"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete_salary">
+
+                                    <input type="hidden"
+                                           name="salary_id"
+                                           value="{{ salary.id }}">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this salary record?');">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EDIT SALARY MODAL -->
+
+                        <div class="modal fade"
+                             id="editSalary{{ salary.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Edit Salary
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form method="post">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="update_salary">
+
+                                        <input type="hidden"
+                                               name="salary_id"
+                                               value="{{ salary.id }}">
+
+
+                                        <div class="modal-body">
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Staff Member
+                                                </label>
+
+                                                <select name="staff"
+                                                        class="form-select"
+                                                        required>
+
+                                                    {% for staff in staff_members %}
+
+                                                        <option value="{{ staff.id }}"
+                                                            {% if staff.id == salary.staff.id %}
+                                                                selected
+                                                            {% endif %}>
+
+                                                            {% if staff.user.get_full_name %}
+                                                                {{ staff.user.get_full_name }}
+                                                            {% else %}
+                                                                {{ staff.user.username }}
+                                                            {% endif %}
+
+                                                        </option>
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="row">
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Month
+                                                    </label>
+
+                                                    <select name="month"
+                                                            class="form-select">
+
+                                                        <option value="1" {% if salary.month == 1 %}selected{% endif %}>January</option>
+                                                        <option value="2" {% if salary.month == 2 %}selected{% endif %}>February</option>
+                                                        <option value="3" {% if salary.month == 3 %}selected{% endif %}>March</option>
+                                                        <option value="4" {% if salary.month == 4 %}selected{% endif %}>April</option>
+                                                        <option value="5" {% if salary.month == 5 %}selected{% endif %}>May</option>
+                                                        <option value="6" {% if salary.month == 6 %}selected{% endif %}>June</option>
+                                                        <option value="7" {% if salary.month == 7 %}selected{% endif %}>July</option>
+                                                        <option value="8" {% if salary.month == 8 %}selected{% endif %}>August</option>
+                                                        <option value="9" {% if salary.month == 9 %}selected{% endif %}>September</option>
+                                                        <option value="10" {% if salary.month == 10 %}selected{% endif %}>October</option>
+                                                        <option value="11" {% if salary.month == 11 %}selected{% endif %}>November</option>
+                                                        <option value="12" {% if salary.month == 12 %}selected{% endif %}>December</option>
+
+                                                    </select>
+
+                                                </div>
+
+
+                                                <div class="col-md-6">
+
+                                                    <label class="form-label">
+                                                        Year
+                                                    </label>
+
+                                                    <input type="number"
+                                                           name="year"
+                                                           class="form-control"
+                                                           value="{{ salary.year }}"
+                                                           min="2000"
+                                                           required>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="mb-3 mt-3">
+
+                                                <label class="form-label">
+                                                    Salary Amount
+                                                </label>
+
+                                                <input type="number"
+                                                       name="amount"
+                                                       class="form-control"
+                                                       value="{{ salary.amount }}"
+                                                       min="0"
+                                                       step="0.01"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Payment Date
+                                                </label>
+
+                                                <input type="date"
+                                                       name="payment_date"
+                                                       class="form-control"
+                                                       value="{{ salary.payment_date|date:'Y-m-d' }}">
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Payment Status
+                                                </label>
+
+                                                <select name="is_paid"
+                                                        class="form-select">
+
+                                                    <option value="False"
+                                                        {% if not salary.is_paid %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Not Paid
+                                                    </option>
+
+                                                    <option value="True"
+                                                        {% if salary.is_paid %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Paid
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- PERFORMANCE MANAGEMENT -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h4 class="mb-1">
+                        Performance Management
+                    </h4>
+
+                    <p class="text-muted mb-0">
+                        Evaluate staff performance and assign ratings.
+                    </p>
+
+                </div>
+
+                <span class="badge bg-primary">
+                    {{ performances|length }} Evaluations
+                </span>
+
+            </div>
+
+
+            <!-- ADD PERFORMANCE -->
+
+            <div class="border rounded p-4 mb-4">
+
+                <h5 class="mb-4">
+                    Add Performance Rating
+                </h5>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <input type="hidden"
+                           name="action"
+                           value="add_performance">
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Staff Member
+                            </label>
+
+                            <select name="staff"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select Staff
+                                </option>
+
+                                {% for staff in staff_members %}
+
+                                    <option value="{{ staff.id }}">
+
+                                        {% if staff.user.get_full_name %}
+                                            {{ staff.user.get_full_name }}
+                                        {% else %}
+                                            {{ staff.user.username }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Evaluation Date
+                            </label>
+
+                            <input type="date"
+                                   name="evaluation_date"
+                                   class="form-control"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Performance Score
+                            </label>
+
+                            <input type="number"
+                                   name="score"
+                                   class="form-control"
+                                   min="0"
+                                   max="100"
+                                   step="0.01"
+                                   placeholder="90"
+                                   required>
+
+                        </div>
+
+
+                        <div class="col-md-8">
+
+                            <label class="form-label">
+                                Comments
+                            </label>
+
+                            <textarea name="comments"
+                                      class="form-control"
+                                      rows="2"
+                                      placeholder="Performance comments..."></textarea>
+
+                        </div>
+
+
+                        <div class="col-md-4 d-flex align-items-end">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Add Rating
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- PERFORMANCE TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Staff</th>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Comments</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for performance in performances %}
+
+                        <tr>
+
+                            <td class="fw-bold">
+
+                                {% if performance.staff.user.get_full_name %}
+                                    {{ performance.staff.user.get_full_name }}
+                                {% else %}
+                                    {{ performance.staff.user.username }}
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ performance.evaluation_date|date:"d M Y" }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge bg-success">
+                                    {{ performance.score|floatformat:0 }}%
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if performance.comments %}
+
+                                    {{ performance.comments|truncatechars:60 }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editPerformance{{ performance.id }}">
+                                    Edit
+                                </button>
+
+
+                                <form method="post"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete_performance">
+
+                                    <input type="hidden"
+                                           name="performance_id"
+                                           value="{{ performance.id }}">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this performance evaluation?');">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EDIT PERFORMANCE MODAL -->
+
+                        <div class="modal fade"
+                             id="editPerformance{{ performance.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Edit Performance Rating
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form method="post">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="update_performance">
+
+                                        <input type="hidden"
+                                               name="performance_id"
+                                               value="{{ performance.id }}">
+
+
+                                        <div class="modal-body">
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Staff Member
+                                                </label>
+
+                                                <select name="staff"
+                                                        class="form-select"
+                                                        required>
+
+                                                    {% for staff in staff_members %}
+
+                                                        <option value="{{ staff.id }}"
+                                                            {% if staff.id == performance.staff.id %}
+                                                                selected
+                                                            {% endif %}>
+
+                                                            {% if staff.user.get_full_name %}
+                                                                {{ staff.user.get_full_name }}
+                                                            {% else %}
+                                                                {{ staff.user.username }}
+                                                            {% endif %}
+
+                                                        </option>
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Evaluation Date
+                                                </label>
+
+                                                <input type="date"
+                                                       name="evaluation_date"
+                                                       class="form-control"
+                                                       value="{{ performance.evaluation_date|date:'Y-m-d' }}"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Performance Score
+                                                </label>
+
+                                                <input type="number"
+                                                       name="score"
+                                                       class="form-control"
+                                                       value="{{ performance.score }}"
+                                                       min="0"
+                                                       max="100"
+                                                       step="0.01"
+                                                       required>
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Comments
+                                                </label>
+
+                                                <textarea name="comments"
+                                                          class="form-control"
+                                                          rows="4">{{ performance.comments }}</textarea>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center text-muted py-4">
+
+                                No performance evaluations have been added yet.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
