@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -1372,12 +1374,56 @@ def menu_management(request):
 
     if request.method == 'POST':
         action = request.POST.get('action')
+        if action == 'add_category':
+            name = request.POST.get('name', '').strip()
+            description = request.POST.get('description', '').strip()
 
+            if not name:
+                messages.error(request, "Category name is required.")
+                return redirect('menu_management')
+
+            Category.objects.create(
+                name=name,
+                description=description
+            )
+
+            messages.success(
+                request,
+                f"Category '{name}' added successfully."
+            )
+
+            return redirect('menu_management')
+
+        elif action == 'update_category':
+            category_id = request.POST.get('category_id')
+
+            category = get_object_or_404(
+                Category,
+                id=category_id
+            )
+
+            name = request.POST.get('name', '').strip()
+            description = request.POST.get('description', '').strip()
+
+            if not name:
+                messages.error(request, "Category name is required.")
+                return redirect('menu_management')
+
+            category.name = name
+            category.description = description
+            category.save()
+
+            messages.success(
+                request,
+                f"Category '{name}' updated successfully."
+            )
+
+            return redirect('menu_management')
         # ========================================================
         # ADD MENU ITEM
         # ========================================================
 
-        if action == 'add':
+        if action == 'add_item':
             category_id = request.POST.get('category')
             name = request.POST.get('name', '').strip()
             description = request.POST.get('description', '').strip()
@@ -1433,7 +1479,7 @@ def menu_management(request):
         # UPDATE MENU ITEM
         # ========================================================
 
-        elif action == 'update':
+        elif action == 'update_item':
             item_id = request.POST.get('item_id')
 
             item = get_object_or_404(
@@ -1498,7 +1544,7 @@ def menu_management(request):
         # DELETE MENU ITEM
         # ========================================================
 
-        elif action == 'delete':
+        elif action == 'delete_item':
             item_id = request.POST.get('item_id')
 
             item = get_object_or_404(
